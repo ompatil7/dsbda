@@ -1,34 +1,29 @@
 import scala.io.Source
 
-object Weather  {
+object Weather {
     def main(args : Array[String]) : Unit = {
-        val filename = "weatherHistory.csv"
+        val file = "wea.csv"
 
-        val lines = Source.fromFile(filename).getLines()
+        val lines = Source.fromFile(file).getLines()
+    
 
-        //map
+    val data = lines.map(line => {
+        val fields = line.split(",")
+        val temp = fields(3).toDouble
+        val dew = fields(4).toDouble
+        val wind = fields(6).toDouble
 
-        val data = lines.map(line => {
-            val fields = line.split(",")
-            val temparature  = fields(3).toDouble,
-            val dewPoint = fields(4).toDouble
-            val windSpeed = fields(6).toDouble
-            (temperature, dewPoint, windSpeed)
-        })
+        (temp, dew, wind)
+    })
 
-        //reduce
+    val (tempSum, dewSum, windSum, count) = data.foldLeft((0.0, 0.0, 0.0, 0)) {
+        case ((tempAcc, dewAcc, windAcc, countAcc), (temp, dew, wind)) =>
+        (tempAcc + temp, dewAcc + dew, windAcc + wind, countAcc+1)
+    }
 
-        val (tempSum, dewPointSum, windSpeedSum, count) = data.foldLeft((0.0, 0.0,0.0, 0)) {
-            case ((tempAcc, dewPointAcc, windSpeedAcc, countAcc), (temperature, dewPoint, windSpeed)) => (tempAcc + temperature, dewPointAcc + dewPoint, windSpeedAcc + windSpeed, countAcc + 1)
-        }
+    val avgTemp = tempSum / count
 
-        val avgTemp = tempSum / count
-        val avgDewPoint = dewPointSum / count
-        val avgWindSpeed = windSpeedSum / count
-
-        println(s"Avg temp : $avgTemp")
-        println(s"Avg temp : $avgDewPoint")
-        println(s"Avg temp : $avgWindSpeed")
+    println(s"Avg temp $avgTemp")
 
     }
 }
